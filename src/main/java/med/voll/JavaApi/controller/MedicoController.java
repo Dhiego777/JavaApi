@@ -28,7 +28,7 @@ public class MedicoController {
 //    pode adicionar tbm os dados default da paginação no pageable
 //    com a anotação @PageableDefault(size = Qtd items da pagina, sort ={"nome"} Ordenar por nome)
     public Page<DadosListagemMedico> listar(@PageableDefault(size = 10, sort = {"nome"}) Pageable paginacao) {
-        return repository.findAll(paginacao).map(DadosListagemMedico::new);
+        return repository.findAllByAtivoTrue(paginacao).map(DadosListagemMedico::new);
     }
 
     @PutMapping
@@ -41,6 +41,9 @@ public class MedicoController {
     @DeleteMapping("/{id}")
     @Transactional
     public void excluir(@PathVariable Long id) {
-        repository.deleteById(id);
+//        exclusao fisica
+//        repository.deleteById(id);
+        Medico medico = repository.getReferenceById(id);
+        medico.excluir();
     }
 }
