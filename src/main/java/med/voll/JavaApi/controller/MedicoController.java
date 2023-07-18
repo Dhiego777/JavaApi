@@ -20,7 +20,7 @@ public class MedicoController {
 
     @PostMapping
     @Transactional
-    public void cadastrar(@RequestBody  @Valid CadastroMedico cadastroMedico){
+    public void cadastrar(@RequestBody @Valid CadastroMedico cadastroMedico){
         repository.save(new Medico(cadastroMedico));
     }
 
@@ -36,5 +36,11 @@ public class MedicoController {
     public void atualizar(@RequestBody  @Valid AtualizarMedico atualizarMedico) {
         Medico medico = repository.getReferenceById(atualizarMedico.id());
         medico.atualizarInformacoes(atualizarMedico);
+    }
+
+    @DeleteMapping("/{id}")
+    @Transactional
+    public void excluir(@PathVariable Long id) {
+        repository.deleteById(id);
     }
 }
