@@ -2,6 +2,7 @@ package med.voll.JavaApi.controller;
 
 import jakarta.validation.Valid;
 import med.voll.JavaApi.medico.*;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,6 +10,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
@@ -21,8 +23,13 @@ public class MedicoController {
 
     @PostMapping
     @Transactional
-    public void cadastrar(@RequestBody @Valid CadastroMedico cadastroMedico){
-        repository.save(new Medico(cadastroMedico));
+    public ResponseEntity cadastrar(@RequestBody @Valid CadastroMedico cadastroMedico, UriComponentsBuilder uriBuilder){
+        var medico = new Medico(cadastroMedico);
+        repository.save(medico);
+
+        var uri = uriBuilder.path("/medicos/{id}").buildAndExpand(medico.getId()).toUri();
+
+        return ResponseEntity.created(uri).body(new DadosDetalhementoMedico(medico));
     }
 
     @GetMapping
@@ -49,5 +56,11 @@ public class MedicoController {
         Medico medico = repository.getReferenceById(id);
         medico.excluir();
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity detalhar(@PathVariable Long id) {
+        Medico medico = repository.getReferenceById(id);
+        return ResponseEntity.ok(new DadosDetalhementoMedico(medico));
     }
 }
